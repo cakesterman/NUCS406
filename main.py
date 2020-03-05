@@ -210,6 +210,14 @@ def make_network(all_users, all_user_mentions, keyword):
 
     print("Created graph in {} seconds".format(end - start))
 
+    for corona_network in nx.connected_component_subgraphs(corona_network):
+        avg_degree = nx.average_shortest_path_length(corona_network) + avg_degree
+
+    avg_degree = avg_degree / nx.number_of_nodes(corona_network)
+
+    print(avg_degree)
+
+
 
 if __name__ == '__main__':
     main()
