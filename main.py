@@ -4,15 +4,17 @@ import matplotlib.pyplot as plt
 
 
 def read_text_file_and_search_keyword(keyword):
-
     user_tweet_dict = {}
     user_tweet_list = []
     user_mentions = []
     user_hashtags = []
     user_sentiments = []
 
-    #with open("G:/Downloads/twitter-data-timpestamped (1).txt", encoding='utf8') as datafile:
-    with open("G:/Downloads/twitter-data-timpestamped.txt", encoding='utf8') as datafile:
+    # with open("G:/Downloads/twitter-data-timpestamped (1).txt", encoding='utf8') as datafile:
+    # with open("G:/Downloads/twitter-data-timpestamped.txt", encoding='utf8') as datafile:
+    # with open("G:/Downloads/twitter-data-timpestamped (2).txt", encoding='utf8') as datafile:
+    # with open("G:/Downloads/twitter-data-timpestamped-03192020.txt", encoding='utf8') as datafile:
+    with open("C:/Users/Cakesterman/Downloads/march20.txt", encoding='utf8') as datafile:
 
         print("Reading in data...")
 
@@ -35,7 +37,7 @@ def read_text_file_and_search_keyword(keyword):
 
                     if user_tweet is not None:
 
-                        #user_tweet_list.append((user_tweet, counter))
+                        # user_tweet_list.append((user_tweet, counter))
                         user_tweet_list.append(user_tweet)
 
                         mention = add_user_mention(line)
@@ -51,7 +53,7 @@ def read_text_file_and_search_keyword(keyword):
                         if hashtags is not None:
                             user_hashtags.append(hashtags)
 
-                        #counter += 1
+                        # counter += 1
 
             # user_tweet_list.append((add_user(line), counter))
 
@@ -64,19 +66,86 @@ def read_text_file_and_search_keyword(keyword):
     return user_tweet_list, user_mentions, user_hashtags
 
 
-def add_user(tweet):
+def read_text_file_search_keyword_by_day(keyword):
+    user_tweet_list = []
+    user_mentions = []
+    user_hashtags = []
+    user_sentiments = []
 
+    # with open("G:/Downloads/twitter-data-timpestamped (1).txt", encoding='utf8') as datafile:
+    # with open("G:/Downloads/twitter-data-timpestamped.txt", encoding='utf8') as datafile:
+    # with open("G:/Downloads/twitter-data-timpestamped (2).txt", encoding='utf8') as datafile:
+    # with open("G:/Downloads/twitter-data-timpestamped-03192020.txt", encoding='utf8') as datafile:
+    with open("C:/Users/Cakesterman/Downloads/day7.txt", encoding='utf8') as datafile:
+
+        print("Reading in data...")
+
+        # data = csv.reader(csvfile)
+
+        line = datafile.readline()
+
+        start = time.perf_counter()
+
+        counter = 1
+        while line:
+
+            # Checks to make sure that the line is a valid line
+            if "Mon " in line or "Tue " in line or "Wed " in line or "Thu " in line or "Fri " in line or "Sat " in line or \
+                    "Sun " in line:
+
+                current_date = line[8:9]
+                current_month = line[4:6]
+
+                # Search day by day
+
+                if keyword in line:
+
+                    user_tweet = add_user(line)
+                    # user_dict = add_user(line)
+
+                    if user_tweet is not None:
+
+                        # user_tweet_list.append((user_tweet, counter))
+                        user_tweet_list.append(user_tweet)
+
+                        mention = add_user_mention(line)
+                        hashtags = add_user_hashtags(line)
+
+                        # if any(ele in line for ele in sentiments_list):
+                        #     user_sentiments.append(add_user_sentiment(line))
+
+                        # if mention is not None means if the list of mentions is greater than 1
+                        if mention is not None:
+                            user_mentions.append(mention)
+
+                        if hashtags is not None:
+                            user_hashtags.append(hashtags)
+
+                        # counter += 1
+
+            # user_tweet_list.append((add_user(line), counter))
+
+            line = datafile.readline()
+
+        end = time.perf_counter()
+
+        print("Parsed data in {} seconds".format(end - start))
+
+    make_network(user_tweet_list, user_mentions, keyword)
+
+    # return user_tweet_list, user_mentions, user_hashtags
+
+
+def add_user(tweet):
     final_tweet_list = []
 
     tweet_list = tweet.split("|")
 
     if len(tweet_list) == 3:
-
         return tweet_list[1], tweet_list[2]
 
 
 def add_user_mention(tweet):
-
     mention_list = []
 
     temp_list = []
@@ -87,7 +156,6 @@ def add_user_mention(tweet):
     temp_list2 = []
 
     for items in temp_list:
-
         temp_list2.append(items.split())
 
     for x in temp_list2:
@@ -97,34 +165,31 @@ def add_user_mention(tweet):
             if y.startswith('@'):
 
                 if y.endswith(':'):
-
                     y = y[0:len(y) - 1]
 
                 mention_list.append(y)
 
-    if len(mention_list) == 1:
-
+    if len(mention_list) == 1 or len(mention_list) > 2:
         return None
 
+    # print(tuple(mention_list))
     return tuple(mention_list)
 
 
 def add_user_hashtags(tweet):
-
     user_hashtags = []
 
     temp_list = tweet.split('|')
-    #print(temp_list)
+    # print(temp_list)
 
     user_hashtags.append(temp_list[1])
 
     for x in temp_list[2].split():
 
         if x.startswith('#'):
-
             user_hashtags.append(x)
 
-    #print(user_hashtags)
+    # print(user_hashtags)
 
     if len(user_hashtags) == 1:
 
@@ -136,27 +201,24 @@ def add_user_hashtags(tweet):
 
 
 def print_values(passed):
-
     for x in passed:
-
         print(x)
 
 
 def main():
-
-    keyword = "China"
+    keyword = "coronavirus"
 
     all_user_tweets_corona, all_user_mentions_corona, all_user_hashtags_corona = read_text_file_and_search_keyword(
         keyword)
 
-    # print_values(all_user_tweets_corona)
-    # print()
-    # print_values(all_user_mentions_corona)
-    # print()
-    # print_values(all_user_hashtags_corona)
+    print_values(all_user_tweets_corona)
+    print()
+    print_values(all_user_mentions_corona)
+    print()
+    print_values(all_user_hashtags_corona)
 
     all_user_tweets_covid19, all_user_mentions_covid19, all_user_hashtags_covid19 = read_text_file_and_search_keyword(
-         "covid-19")
+        "covid-19")
     # print_values(all_user_tweets_covid19)
     # print()
     # print_values(all_user_mentions_covid19)
@@ -164,6 +226,8 @@ def main():
     # print_values(all_user_hashtags_covid19)
 
     make_network(all_user_tweets_corona, all_user_mentions_corona, keyword)
+    make_network(all_user_tweets_covid19, all_user_mentions_covid19, "Covid-19")
+
 
 # def add_user_sentiment(tweet):
 #
@@ -174,37 +238,38 @@ def main():
 #     return (user, word[0].strip())
 
 
-
 def make_network(all_users, all_user_mentions, keyword):
-
     corona_network = nx.Graph()
 
     # Adding nodes to network from users who tweeted
-    for user in all_users:
+    # for user in all_users:
+    #     pass
+    #     #corona_network.add_node(user[0])
+    #
+    # for mentions in all_user_mentions:
+    #
+    #     print(mentions)
+    #
+    #     for x in mentions:
+    #         pass
+    #         #corona_network.add_node(x)
 
-        corona_network.add_node(user[0])
-
-    for mentions in all_user_mentions:
-
-        for x in mentions:
-
-            corona_network.add_node(x)
-
-    try:
-        corona_network.add_edges_from(all_user_mentions)
-    except:
-        # Fails if there are more than 3 tuples
-        pass
+    # try:
+    corona_network.add_edges_from(all_user_mentions)
+    # except:
+    #     # Fails if there are more than 3 tuples
+    #     pass
 
     print(nx.info(corona_network))
 
-    plt.figure(figsize=(50, 40))
+    plt.figure(figsize=(55, 45))
     plt.title(keyword)
 
     start = time.perf_counter()
 
-    nx.draw(corona_network, with_labels=True)
+    nx.draw(corona_network, with_labels=False)
     plt.show()
+    plt.savefig("Test")
 
     end = time.perf_counter()
 
