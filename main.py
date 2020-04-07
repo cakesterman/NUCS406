@@ -5,7 +5,7 @@ from networkx.algorithms.community import greedy_modularity_communities
 import matplotlib.pyplot as plt
 
 
-def read_text_file_and_search_keyword(keyword):
+def read_text_file_and_search_keyword(keyword, file):
 
     user_tweet_dict = {}
     user_tweet_list = []
@@ -13,7 +13,7 @@ def read_text_file_and_search_keyword(keyword):
     user_hashtags = []
     user_sentiments = []
 
-    with open("Data by Day/Mon_Mar_16.txt", encoding='utf8') as datafile:
+    with open("Data by Day/{}".format(file), encoding='utf8') as datafile:
 
         print("Reading in data...")
 
@@ -205,10 +205,13 @@ def print_values(passed):
 
 
 def main():
+
     keyword = "coronavirus"
 
+    file_to_read = "Mon_Mar_16.txt"
+
     all_user_tweets_corona, all_user_mentions_corona, all_user_hashtags_corona = read_text_file_and_search_keyword(
-        keyword)
+        keyword, file_to_read)
 
     # print_values(all_user_tweets_corona)
     # print()
@@ -216,8 +219,8 @@ def main():
     # print()
     # print_values(all_user_hashtags_corona)
 
-    all_user_tweets_covid19, all_user_mentions_covid19, all_user_hashtags_covid19 = read_text_file_and_search_keyword(
-        "covid-19")
+    # all_user_tweets_covid19, all_user_mentions_covid19, all_user_hashtags_covid19 = read_text_file_and_search_keyword(
+    #     "covid-19")
     # print_values(all_user_tweets_covid19)
     # print()
     # print_values(all_user_mentions_covid19)
@@ -225,10 +228,10 @@ def main():
     # print_values(all_user_hashtags_covid19)
 
     corona_network = make_network(all_user_tweets_corona, all_user_mentions_corona, keyword)
-    analyze_network(corona_network, all_user_mentions_corona)
+    analyze_network(corona_network, all_user_mentions_corona, file_to_read)
 
 
-    covid_network = make_network(all_user_tweets_covid19, all_user_mentions_covid19, "Covid-19")
+    # covid_network = make_network(all_user_tweets_covid19, all_user_mentions_covid19, "Covid-19")
 
 
 # def add_user_sentiment(tweet):
@@ -265,7 +268,7 @@ def make_network(all_users, all_user_mentions, keyword):
     return corona_network
 
 
-def analyze_network(network, all_user_mentions):
+def analyze_network(network, all_user_mentions, file):
 
     # Analzye clustering
     def analyze_clustering():
@@ -279,6 +282,8 @@ def analyze_network(network, all_user_mentions):
 
         community = greedy_modularity_communities(network)
 
+        community_list = []
+
         biggest_community_len = 0
         biggest_community = None
 
@@ -289,34 +294,53 @@ def analyze_network(network, all_user_mentions):
                 biggest_community_len = len(x)
                 biggest_community = x
 
+            min_community_size = 50
+            if len(x) >= min_community_size:
+
+                community_list.append(x)
+
+        # print(community_list)
+
         print("Biggest community length:", biggest_community_len)
         print(biggest_community)
 
-        def graph_community():
+        def graph_community(community):
 
-            new_list = []
+            new_mention_list = []
 
             for mentions in all_user_mentions:
 
                 for users in mentions:
 
-                    if users in biggest_community:
+                    if users in community:
 
-                        # print("TRUE")
-                        new_list.append(mentions)
+                        new_mention_list.append(mentions)
 
             community_network = nx.Graph()
 
-            community_network.add_edges_from(new_list)
+            community_network.add_edges_from(new_mention_list)
 
             print(nx.info(community_network))
+            # print(nx.info(community_network)[36:38])
 
             plt.figure(figsize=(55, 45))
+            plt.title("{} -- Community Length: {} -- {}".format(file[0:10], len(community), nx.info(community_network)))
 
             nx.draw(community_network, with_labels=True)
+
+            plt.savefig("Communities/{}_Community_Nodes-{}.png".format(
+                file[0:10], nx.number_of_nodes(community_network)))
+
             plt.show()
 
-        graph_community()
+
+
+        for communities in community_list:
+
+            graph_community(communities)
+
+
+        #graph_community()
 
 
     # analyze_clustering()
