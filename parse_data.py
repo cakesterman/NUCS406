@@ -39,10 +39,7 @@ def parse_data_by_day(filename):
 
                         print("Current file line is", file_line)
 
-                        #current_date.append(convert_to_bcd(line[0:28]))\
                         current_date = convert_to_bcd(line[0:10])
-                        #current_date.pop(3)
-                        #current_date.pop(3)
 
                         new_filename = convert_from_bcd(current_date)
                         new_filename = new_filename.replace(' ', '_') + '.txt'
@@ -50,6 +47,8 @@ def parse_data_by_day(filename):
                         print("Writing in file {}".format(new_filename))
 
                     if current_date == convert_to_bcd(line[0:10]):
+
+                        # Used to call the write function in here every time, was extremely slow
 
                         # Write to new file for that date
 
@@ -66,6 +65,10 @@ def parse_data_by_day(filename):
             file_line += 1
 
             line = datafile.readline()
+
+    end = time.perf_counter()
+
+    print("Finished in {} seconds".format(end-start))
 
 
 def convert_to_bcd(date_string):
@@ -168,4 +171,4 @@ def convert_from_bcd(bcd_data):
 
 #convert_from_bcd( convert_to_bcd("Mon Feb 28 11:12:11 EST 2020") )
 
-parse_data_by_day("G:/Downloads/twitter-data-timpestamped (2).txt")
+parse_data_by_day("G:/Downloads/twitter-data-timpestamped-03242020.txt")
