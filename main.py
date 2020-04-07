@@ -1,20 +1,19 @@
 import time
 import networkx as nx
+from networkx.algorithms.community import k_clique_communities
+from networkx.algorithms.community import greedy_modularity_communities
 import matplotlib.pyplot as plt
 
 
 def read_text_file_and_search_keyword(keyword):
+
     user_tweet_dict = {}
     user_tweet_list = []
     user_mentions = []
     user_hashtags = []
     user_sentiments = []
 
-    # with open("G:/Downloads/twitter-data-timpestamped (1).txt", encoding='utf8') as datafile:
-    # with open("G:/Downloads/twitter-data-timpestamped.txt", encoding='utf8') as datafile:
-    # with open("G:/Downloads/twitter-data-timpestamped (2).txt", encoding='utf8') as datafile:
-    # with open("G:/Downloads/twitter-data-timpestamped-03192020.txt", encoding='utf8') as datafile:
-    with open("C:/Users/Cakesterman/Downloads/march20.txt", encoding='utf8') as datafile:
+    with open("Data by Day/Mon_Mar_16.txt", encoding='utf8') as datafile:
 
         print("Reading in data...")
 
@@ -76,7 +75,7 @@ def read_text_file_search_keyword_by_day(keyword):
     # with open("G:/Downloads/twitter-data-timpestamped.txt", encoding='utf8') as datafile:
     # with open("G:/Downloads/twitter-data-timpestamped (2).txt", encoding='utf8') as datafile:
     # with open("G:/Downloads/twitter-data-timpestamped-03192020.txt", encoding='utf8') as datafile:
-    with open("C:/Users/Cakesterman/Downloads/day7.txt", encoding='utf8') as datafile:
+    with open("C:/Users/Cakesterman/Downloads/day3.txt", encoding='utf8') as datafile:
 
         print("Reading in data...")
 
@@ -211,11 +210,11 @@ def main():
     all_user_tweets_corona, all_user_mentions_corona, all_user_hashtags_corona = read_text_file_and_search_keyword(
         keyword)
 
-    print_values(all_user_tweets_corona)
-    print()
-    print_values(all_user_mentions_corona)
-    print()
-    print_values(all_user_hashtags_corona)
+    # print_values(all_user_tweets_corona)
+    # print()
+    # print_values(all_user_mentions_corona)
+    # print()
+    # print_values(all_user_hashtags_corona)
 
     all_user_tweets_covid19, all_user_mentions_covid19, all_user_hashtags_covid19 = read_text_file_and_search_keyword(
         "covid-19")
@@ -225,8 +224,11 @@ def main():
     # print()
     # print_values(all_user_hashtags_covid19)
 
-    make_network(all_user_tweets_corona, all_user_mentions_corona, keyword)
-    make_network(all_user_tweets_covid19, all_user_mentions_covid19, "Covid-19")
+    corona_network = make_network(all_user_tweets_corona, all_user_mentions_corona, keyword)
+    analyze_network(corona_network, all_user_mentions_corona)
+
+
+    covid_network = make_network(all_user_tweets_covid19, all_user_mentions_covid19, "Covid-19")
 
 
 # def add_user_sentiment(tweet):
@@ -239,26 +241,10 @@ def main():
 
 
 def make_network(all_users, all_user_mentions, keyword):
+
     corona_network = nx.Graph()
 
-    # Adding nodes to network from users who tweeted
-    # for user in all_users:
-    #     pass
-    #     #corona_network.add_node(user[0])
-    #
-    # for mentions in all_user_mentions:
-    #
-    #     print(mentions)
-    #
-    #     for x in mentions:
-    #         pass
-    #         #corona_network.add_node(x)
-
-    # try:
     corona_network.add_edges_from(all_user_mentions)
-    # except:
-    #     # Fails if there are more than 3 tuples
-    #     pass
 
     print(nx.info(corona_network))
 
@@ -267,13 +253,74 @@ def make_network(all_users, all_user_mentions, keyword):
 
     start = time.perf_counter()
 
-    nx.draw(corona_network, with_labels=False)
-    plt.show()
-    plt.savefig("Test")
+    #nx.draw(corona_network, with_labels=False)
+    #nx.draw_networkx_edges(corona_network, pos=nx.spring_layout(corona_network))
+    #plt.show()
+    #plt.savefig("Test")
 
     end = time.perf_counter()
 
     print("Created graph in {} seconds".format(end - start))
+
+    return corona_network
+
+
+def analyze_network(network, all_user_mentions):
+
+    # Analzye clustering
+    def analyze_clustering():
+
+        print("Average clustering:", nx.average_clustering(network))
+        print("Clustering:", nx.clustering(network))
+        print("Generalized degree:", nx.generalized_degree(network))
+
+    # Analyze communities
+    def analyze_communities():
+
+        community = greedy_modularity_communities(network)
+
+        biggest_community_len = 0
+        biggest_community = None
+
+        for x in community:
+
+            if len(x) > biggest_community_len:
+
+                biggest_community_len = len(x)
+                biggest_community = x
+
+        print("Biggest community length:", biggest_community_len)
+        print(biggest_community)
+
+        def graph_community():
+
+            new_list = []
+
+            for mentions in all_user_mentions:
+
+                for users in mentions:
+
+                    if users in biggest_community:
+
+                        # print("TRUE")
+                        new_list.append(mentions)
+
+            community_network = nx.Graph()
+
+            community_network.add_edges_from(new_list)
+
+            print(nx.info(community_network))
+
+            plt.figure(figsize=(55, 45))
+
+            nx.draw(community_network, with_labels=True)
+            plt.show()
+
+        graph_community()
+
+
+    # analyze_clustering()
+    analyze_communities()
 
 
 if __name__ == '__main__':
