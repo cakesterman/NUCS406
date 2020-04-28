@@ -54,8 +54,6 @@ def read_text_file_and_search_keyword(keyword, file):
 
                         # counter += 1
 
-            # user_tweet_list.append((add_user(line), counter))
-
             line = datafile.readline()
 
         end = time.perf_counter()
@@ -129,11 +127,6 @@ def add_user_hashtags(tweet):
 
 
             user_hashtags.append(hashtag)
-            # user_hashtags.append(x.translate(str.maketrans('', '', string.punctuation)))
-
-    # print(user_hashtags)
-
-    #user_hashtags.pop(0)
 
     if len(user_hashtags) <= 2 or len(user_hashtags) > 4:
 
@@ -141,7 +134,6 @@ def add_user_hashtags(tweet):
 
     else:
 
-        # print(tuple(user_hashtags))
         return tuple(user_hashtags)
 
 
@@ -172,37 +164,13 @@ def main():
     #
     # make_network_hashtags(all_user_hashtags_corona, file_to_read)
 
-    # print_values(all_user_tweets_corona)
-    # print()
-    # print_values(all_user_mentions_corona)
-    # print()
-    # print_values(all_user_hashtags_corona)
-
-    # all_user_tweets_covid19, all_user_mentions_covid19, all_user_hashtags_covid19 = read_text_file_and_search_keyword(
-    #     "covid-19")
-    # print_values(all_user_tweets_covid19)
-    # print()
-    # print_values(all_user_mentions_covid19)
-    # print()
-    # print_values(all_user_hashtags_covid19)
-
     # corona_network = make_network(all_user_tweets_corona, all_user_mentions_corona, keyword)
     # # analyze_network(corona_network, all_user_mentions_corona, file_to_read)
     #
 
     # analyze_network(corona_hashtag_network, _, all_user_hashtags_corona)
 
-
     # covid_network = make_network(all_user_tweets_covid19, all_user_mentions_covid19, "Covid-19")
-
-
-# def add_user_sentiment(tweet):
-#
-#     word = [sentiment for sentiment in sentiments_list if(sentiment in tweet)]
-#
-#     user = tweet.split('|')[1]
-#
-#     return (user, word[0].strip())
 
 
 def make_network(all_users, all_user_mentions, keyword):
@@ -233,11 +201,6 @@ def make_network_hashtags(all_user_hashtags, file):
 
     corona_hashtag_network = nx.Graph()
 
-    # try:
-    #     corona_hashtag_network.add_edges_from(all_user_hashtags)
-    # except:
-    #     pass
-
     for x in all_user_hashtags:
 
         try:
@@ -251,10 +214,6 @@ def make_network_hashtags(all_user_hashtags, file):
     print(nx.info(corona_hashtag_network))
 
     degree_centrality_dict = nx.degree_centrality(corona_hashtag_network)
-    # print(degree_centrality_dict)
-
-    #del degree_centrality_dict["#coronavirus"]
-
 
     highest_value = 0
     hashtag = ''
@@ -275,8 +234,6 @@ def make_network_hashtags(all_user_hashtags, file):
     # del degree_centrality_dict["#COVID2019"]
     # del degree_centrality_dict["#covidー19uk"]
 
-
-    # print(Counter(degree_centrality_dict).most_common(10))
     top_10_values = Counter(degree_centrality_dict).most_common(20)
     print(top_10_values)
 
@@ -285,12 +242,11 @@ def make_network_hashtags(all_user_hashtags, file):
     centraility = [x[1] for x in top_10_values]
     labels = [x[0] for x in top_10_values]
     y_pos = np.arange(len(labels))
-    # print( [str(x[1]) for x in top_10_values] )
-    print(centraility)
-    print(labels)
+    # print(centraility)
+    # print(labels)
 
-    # plt.figure(figsize=(19, 10))
 
+    # Plots a horizontal bar graph
     fig, ax = plt.subplots()
 
     ax.barh(y_pos, centraility, align='center')
@@ -309,6 +265,7 @@ def make_network_hashtags(all_user_hashtags, file):
     # plt.axis("equal")
     # plt.show()
 
+    # Writes the hashtags and centrality to a CSV file
     #with open(f"{file[16:len(file)-3]}_Degree-Centrality_1.csv", 'w', newline='', encoding='utf-8') as csvfile:
     # with open(f"Degree Centrality Graphs/Degree Centrality CSV/{file[4:len(file) - 3]}_Degree-Centrality_1.csv", 'w', newline='', encoding='utf-8') as csvfile:
     #
